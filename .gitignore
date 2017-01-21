@@ -1,0 +1,8 @@
+settingup.sh
+node_modules/
+.git/
+.npm/
+~*
+.DS_Store
+*.swp
+*.log

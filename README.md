@@ -1,0 +1,2 @@
+# minions
+slack bot template
