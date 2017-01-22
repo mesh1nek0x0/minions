@@ -1,4 +1,5 @@
 settingup.sh
+client_secret.json
 node_modules/
 .git/
 .npm/

@@ -1,4 +1,5 @@
 const Botkit = require('botkit');
+const googleCalendar = require('./google-calender.js');
 
 if (!process.env.token) {
     console.log('Error: Specify token in enviroment');
@@ -18,5 +19,6 @@ controller.spawn({
 });
 
 controller.hears('hi', ['direct_message', 'direct_mention', 'mention'], function(bot, message) {
-    bot.reply(message, 'hi! from bot!');
+    bot.reply(message, 'hi! I\'m minions? your recently event is bellow\n');
+    googleCalendar.getEvents();
 });
