@@ -10,29 +10,41 @@ var TOKEN_DIR = (process.env.HOME || process.env.HOMEPATH || process.env.USERPRO
 var TOKEN_PATH = TOKEN_DIR + 'calendar-nodejs-quickstart.json';
 
 exports.getEvents = (() => {
-    fs.readFile('client_secret.json', function processClientSecrets(err, content) {
-        if (err) {
-            console.log('Error loading client secret file:' + err);
-            return;
-        }
-        authrize(JSON.parse(content), listEvent);
+    return new Promise(function (resolve, reject) {
+        fs.readFile('client_secret.json', function processClientSecrets(err, content) {
+            if (err) {
+                console.log('Error loading client secret file:' + err);
+                reject(new Error);
+            }
+            authrize(JSON.parse(content), listEvent).then(function (event) {
+                resolve(event);
+            }).catch(function (err) {
+                reject(err);
+            });
+        });
     });
 });
 
 function authrize(credential, callback) {
-    var clientSecret = credential.installed.client_secret;
-    var clientId = credential.installed.client_id;
-    var redirectUrl = credential.installed.redirect_uris[0];
-    var auth = new googleAuth();
-    var oauth2Client = new auth.OAuth2(clientId, clientSecret, redirectUrl);
+    return new Promise(function (resolve, reject) {
+        var clientSecret = credential.installed.client_secret;
+        var clientId = credential.installed.client_id;
+        var redirectUrl = credential.installed.redirect_uris[0];
+        var auth = new googleAuth();
+        var oauth2Client = new auth.OAuth2(clientId, clientSecret, redirectUrl);
 
-    fs.readFile(TOKEN_PATH, function(err, token) {
-        if (err) {
-            getNewToken(oauth2Client, callback);
-        } else {
-            oauth2Client.credentials = JSON.parse(token);
-            callback(oauth2Client);
-        }
+        fs.readFile(TOKEN_PATH, function(err, token) {
+            if (err) {
+                getNewToken(oauth2Client, callback);
+            } else {
+                oauth2Client.credentials = JSON.parse(token);
+                callback(oauth2Client).then(function (value) {
+                    resolve(value);
+                }).catch(function (error) {
+                    reject(error);
+                });
+            }
+        });
     });
 }
 
@@ -75,29 +87,32 @@ function storeToken(token) {
 }
 
 function listEvent(auth) {
-    var calendar = google.calendar('v3');
-    calendar.events.list({
-        auth: auth,
-        calendarId: 'primary',
-        timeMin: (new Date()).toISOString(),
-        maxResults: 10,
-        singleEvents: true,
-        orderBy: 'startTime'
-    }, function(err, response) {
-        if (err) {
-            console.log('The API returned an error:' + err);
-            return;
-        }
-        var events = response.items;
-        if (events.length == 0) {
-            console.log('No upcoming events found.');
-        } else {
-            console.log('list up upcoming events *max 10 events');
-            for (var i = 0; i < events.length; i++) {
-                var event = events[i];
-                var start = event.start.dateTime || event.start.date;
-                console.log('%s - %s', start, event.summary);
+    return new Promise(function (resolve, reject) {
+        var calendar = google.calendar('v3');
+        calendar.events.list({
+            auth: auth,
+            calendarId: 'primary',
+            timeMin: (new Date()).toISOString(),
+            maxResults: 10,
+            singleEvents: true,
+            orderBy: 'startTime'
+        }, function(err, response) {
+            if (err) {
+                console.log('The API returned an error:' + err);
+                reject('API ERROR');
             }
-        }
+            var events = response.items;
+            if (events.length == 0) {
+                console.log('No upcoming events found.');
+            } else {
+                console.log('list up upcoming events *max 10 events');
+                for (var i = 0; i < events.length; i++) {
+                    var event = events[i];
+                    var start = event.start.dateTime || event.start.date;
+                    console.log('%s - %s', start, event.summary);
+                    resolve(start + ' : ' + event.summary);
+                }
+            }
+        });
     });
 }
