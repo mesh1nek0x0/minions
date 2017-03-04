@@ -1,0 +1,13 @@
+version: '2'
+services:
+  jenkins-php:
+    image: mesh1neko/jenkins-php:1.0
+    ports:
+      - 8080:8080
+  minions:
+    build: .
+    volumes:
+      - ./app/:/home/minions/app:rw
+    env_file: .env
+    links:
+      - jenkins-php
