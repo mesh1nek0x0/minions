@@ -4,7 +4,7 @@
   "description": "request task and notify schedule",
   "main": "index.js",
   "scripts": {
-    "start": "token=$MINIONS_TOKEN node index.js",
+    "start": "token=$MINIONS_TOKEN user=$USER pass=$PASS node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "mesh1neko",
@@ -12,7 +12,8 @@
   "dependencies": {
     "botkit": "^0.4.9",
     "google-auth-library": "^0.10.0",
-    "googleapis": "^16.1.0"
+    "googleapis": "^16.1.0",
+    "jenkins": "^0.20.0"
   },
   "devDependencies": {
     "eslint": "^3.14.0",

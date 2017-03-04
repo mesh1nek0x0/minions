@@ -1,5 +1,5 @@
 const Botkit = require('botkit');
-const googleCalendar = require('./google-calender.js');
+const attenkins = require('./attenkins.js');
 
 if (!process.env.token) {
     console.log('Error: Specify token in enviroment');
@@ -19,11 +19,12 @@ controller.spawn({
 });
 
 controller.hears('hi', ['direct_message', 'direct_mention', 'mention'], function(bot, message) {
-    bot.reply(message, 'hi! I\'m minions! your recently event is bellow\n');
-    googleCalendar.getEvents().then(function (event) {
-        bot.reply(message, event);
-    }).catch(function (error) {
-        bot.reply(message, 'sorry unkown error has occurred....');
-        console.log(error);
+    bot.api.users.info({user: message.user}, (error, response) => {
+        attenkins.checkInOffice(response.user.name)
+        .then(function () {
+            bot.reply(message, 'hi! I\'m minions! you checked in office now\n');
+        }).catch(function () {
+            bot.reply(message, 'hi! I\'m minions! sorry I failed mission\n');
+        });
     });
 });
