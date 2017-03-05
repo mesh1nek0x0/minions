@@ -1,8 +1,5 @@
 FROM node:7
 
-# set timezone
-RUN ln -sf /usr/share/zoneinfo/Asia/Tokyo /etc/localtime
-
 # add application user
 RUN useradd -s /bin/false -m minions && \
 mkdir /home/minions/app

@@ -8,4 +8,4 @@ node_modules/
 *.swp
 *.log
 output/*
-.env
+.env.minions
