@@ -9,7 +9,7 @@ services:
     shm_size: 1g
 
   jenkins-php:
-    image: mesh1neko/jenkins-php:1.0
+    image: dvmedvedev/jenkins-php-codeception
     ports:
       - 8080:8080
     env_file: .env.tz
