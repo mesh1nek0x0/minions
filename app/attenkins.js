@@ -1,7 +1,21 @@
 'use strict';
 
+const config = require('config');
+const util = require('util');
+
 const jenkins = require('jenkins')(
-    { baseUrl: 'http://' + process.env.user + ':' + process.env.pass + '@localhost:8080', crumbIsuser: true, promisify: true});
+    {
+        baseUrl: util.format(
+            'http://%s:%s@%s:%s',
+            config.jenkins.basicUser,
+            config.jenkins.basicPass,
+            config.jenkins.host,
+            config.jenkins.port
+        ),
+        crumbIssuer: true,
+        promisify: true
+    }
+);
 
 
 exports.getServerInfo = (() => {

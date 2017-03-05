@@ -1,0 +1,8 @@
+{
+  "jenkins" : {
+    "basicUser" : "mesh1neko",
+    "basicPass" : "pass",
+    "host" : "jenkins-php",
+    "port" : "8080"
+  }
+}

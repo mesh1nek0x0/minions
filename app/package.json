@@ -4,13 +4,14 @@
   "description": "request task and notify schedule",
   "main": "index.js",
   "scripts": {
-    "start": "token=$MINIONS_TOKEN user=$USER pass=$PASS node index.js",
+    "start": "token=$MINIONS_TOKEN node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "mesh1neko",
   "license": "ISC",
   "dependencies": {
     "botkit": "^0.4.9",
+    "config": "^1.25.1",
     "google-auth-library": "^0.10.0",
     "googleapis": "^16.1.0",
     "jenkins": "^0.20.0"
