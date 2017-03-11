@@ -7,6 +7,7 @@ if (!process.env.token) {
 }
 
 const controller = Botkit.slackbot({
+    retry: true,
     debug: false
 });
 
@@ -26,5 +27,11 @@ controller.hears('hi', ['direct_message', 'direct_mention', 'mention'], function
         }).catch(function () {
             bot.reply(message, 'hi! I\'m minions! sorry I failed mission\n');
         });
+    });
+});
+
+controller.hears('info', ['direct_message', 'direct_mention', 'mention'], function(bot, message) {
+    bot.api.users.info({user: message.user}, (error, response) => {
+        bot.reply(message, 'hi ' + response.user.name + '! I\'m minions! I\'m still alive now\n');
     });
 });

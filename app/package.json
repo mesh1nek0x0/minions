@@ -10,7 +10,7 @@
   "author": "mesh1neko",
   "license": "ISC",
   "dependencies": {
-    "botkit": "^0.4.9",
+    "botkit": "^0.5.1",
     "config": "^1.25.1",
     "google-auth-library": "^0.10.0",
     "googleapis": "^16.1.0",
