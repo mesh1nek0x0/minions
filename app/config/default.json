@@ -3,7 +3,12 @@
     "basicUser" : "mesh1neko",
     "basicPass" : "pass",
     "host" : "jenkins-php",
-    "port" : "8080"
+    "port" : "8080",
+    "job" : {
+      "attenkins" : {
+        "prefix" : "checkInOut"
+      }
+    }
   },
   "botkit" : {
     "retryMax" : 3
