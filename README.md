@@ -1,6 +1,7 @@
 # minions
 minions is slack bot with jenkins + selenium.
 
+# for users
 ## step overview
 1. add slack-bot token to .env.minions
 1. docker-compose up -d
@@ -28,4 +29,11 @@ $ docker-compose restart minions
 ```
 $ docker-composer stop
 $ docker-composer rm -v
+```
+
+# for developers
+Use nodemon for monitoring any changes in your source code and restarting server.
+```
+$ docker-compose run --rm minions /bin/bash
+# token=$MINIONS_TOKEN $(npm bin)/nodemon
 ```
