@@ -27,14 +27,23 @@ exports.getServerInfo = (() => {
     });
 });
 
-exports.checkInOffice = ((user) => {
+exports.checkInOutOffice = ((user, greeting) => {
     return new Promise(function (resolve, reject) {
-        jenkins.job.build({name: 'slack-test', parameters: {user: user}})
-        .then(function () {
-            console.log('slack-test is kicked by ' + user);
-            resolve(user);
+        jenkins.job.build({
+            name: util.format(
+                '%s-%s',
+                config.jenkins.job.attenkins.prefix,
+                user
+            ),
+            parameters: {
+                user: user,
+                group: greeting
+            }
+        }).then(function () {
+            console.log(greeting + ' job is kicked by ' + user);
+            resolve();
         }).catch(function () {
-            console.log('slack-test couldn\'t kicked');
+            console.log(greeting + ' job couldn\'t kicked');
             reject();
         });
     });

@@ -21,11 +21,17 @@ controller.spawn({
     }
 });
 
-controller.hears('hi', ['direct_message', 'direct_mention', 'mention'], function(bot, message) {
+controller.hears(['hi', 'bye'], ['direct_message', 'direct_mention', 'mention'], function(bot, message) {
     bot.api.users.info({user: message.user}, (error, response) => {
-        attenkins.checkInOffice(response.user.name)
+        attenkins.checkInOutOffice(response.user.name, message.text)
         .then(function () {
-            bot.reply(message, 'hi! I\'m minions! you checked in office now\n');
+            bot.reply(
+                message,
+                util.format(
+                    'hi! I\'m minions! you checked %s office now\n',
+                    (message.text == 'hi') ? 'in' : 'out'
+                )
+            );
         }).catch(function () {
             bot.reply(message, 'hi! I\'m minions! sorry I failed mission\n');
         });
