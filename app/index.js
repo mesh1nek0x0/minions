@@ -1,5 +1,7 @@
 const Botkit = require('botkit');
 const attenkins = require('./attenkins.js');
+const config = require('config');
+const util = require('util');
 
 if (!process.env.token) {
     console.log('Error: Specify token in enviroment');
@@ -7,7 +9,7 @@ if (!process.env.token) {
 }
 
 const controller = Botkit.slackbot({
-    retry: true,
+    retry: config.botkit.retryMax,
     debug: false
 });
 
@@ -32,6 +34,13 @@ controller.hears('hi', ['direct_message', 'direct_mention', 'mention'], function
 
 controller.hears('info', ['direct_message', 'direct_mention', 'mention'], function(bot, message) {
     bot.api.users.info({user: message.user}, (error, response) => {
-        bot.reply(message, 'hi ' + response.user.name + '! I\'m minions! I\'m still alive now\n');
+        bot.reply(
+            message,
+            util.format(
+                'hi %s ! I\'m minions! I\'m still alive now!\n retryMax is %d',
+                response.user.name,
+                config.botkit.retryMax
+            )
+        );
     });
 });

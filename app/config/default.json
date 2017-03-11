@@ -4,5 +4,8 @@
     "basicPass" : "pass",
     "host" : "jenkins-php",
     "port" : "8080"
+  },
+  "botkit" : {
+    "retryMax" : 3
   }
 }
