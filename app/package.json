@@ -4,7 +4,7 @@
   "description": "request task and notify schedule",
   "main": "index.js",
   "scripts": {
-    "start": "token=$MINIONS_TOKEN node index.js",
+    "start": "token=$MINIONS_TOKEN forever index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "mesh1neko",
