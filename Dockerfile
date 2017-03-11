@@ -2,7 +2,7 @@ FROM node:7
 
 # add application user
 RUN useradd -s /bin/false -m minions && \
-mkdir /home/minions/app
+mkdir /home/minions/app && npm install forever -g
 
 ENV HOME=/home/minions
 

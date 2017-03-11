@@ -44,3 +44,12 @@ controller.hears('info', ['direct_message', 'direct_mention', 'mention'], functi
         );
     });
 });
+
+controller.hears('forever', ['direct_message', 'direct_mention', 'mention'], function(bot, message) {
+    // TODO: promiseでメッセージが出てからthrowさせる
+    bot.reply(
+        message,
+        'forever test is started! I\'m going down... good bye!'
+    );
+    throw new Error('forever test');
+});
