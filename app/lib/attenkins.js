@@ -27,11 +27,15 @@ module.exports = class Attenkins{
     }
 
     getServerInfo() {
-        this.jenkins.info().
-        then(function (data) {
-            console.log(data);
-        }).catch(function (error) {
-            console.log(error);
+        return new Promise((resolve, reject) => {
+            this.jenkins.info().
+            then(function (data) {
+                console.log(data);
+                resolve();
+            }).catch(function (error) {
+                console.log(error);
+                reject();
+            });
         });
     }
 

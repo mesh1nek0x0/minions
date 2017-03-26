@@ -20,7 +20,7 @@ const jenkins = require('jenkins')(
 );
 
 
-describe('test - info test', function () {
+describe('test - info', function () {
     let target;
     let spy;
     let stub;
@@ -63,6 +63,45 @@ describe('test - info test', function () {
         .catch(function () {
             expect(spy.callCount).to.equal(2);
             expect(spy.args[1][0]).to.equal('sample-end-reject');
+        });
+    });
+});
+
+describe('test - getServerInfo', function () {
+    let target = new Attenkins();
+    let stub;
+    let spy;
+
+    beforeEach(function () {
+        spy = sinon.spy(console, 'log');
+    });
+
+    afterEach(function () {
+        spy.restore();
+        stub.restore();
+    });
+
+    it('-- getServerinfo success', function () {
+        stub = sinon.stub(jenkins, 'info').returns(Promise.resolve('hoge'));
+
+        target.setJenkins(jenkins);
+
+        return target.getServerInfo().then(function () {
+            expect(spy.calledOnce);
+            expect(spy.args[0][0]).to.equal('hoge');
+        });
+    });
+
+    it('-- getServerInfo failure', function () {
+        stub = sinon.stub(jenkins, 'info').returns(Promise.reject('error'));
+
+        target.setJenkins(jenkins);
+
+        return target.getServerInfo().then(
+            function () {}
+        ).catch(function () {
+            expect(spy.calledOnce);
+            expect(spy.args[0][0]).to.equal('error');
         });
     });
 });
