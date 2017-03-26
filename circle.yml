@@ -1,0 +1,7 @@
+machine:
+  timezone: Asia/Tokyo
+  node:
+    version: v6.1.0
+
+general:
+  build_dir: app
