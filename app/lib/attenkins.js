@@ -3,6 +3,7 @@
 const config = require('config');
 const util = require('util');
 const jenkins = require('jenkins');
+const moment = require('moment-timezone');
 
 module.exports = class Attenkins{
 
@@ -40,7 +41,17 @@ module.exports = class Attenkins{
     }
 
     checkInOutOffice(user, greeting) {
+        console.log('now:' + moment().format('HH') + ' o\'clock');
         return new Promise((resolve, reject) => {
+            // 15時以降にhiするのは勘違いの可能性大
+            if (moment().format('HH') >= 15 && greeting == 'hi') {
+                return reject('fail-safe');
+            }
+            // 13時前にbyeするのは勘違いの可能性大
+            if (moment().format('HH') < 13 && greeting == 'bye') {
+                return reject('fail-safe');
+            }
+
             this.jenkins.job.build({
                 name: util.format(
                     '%s-%s',
