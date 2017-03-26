@@ -59,13 +59,11 @@ module.exports = class Attenkins{
 
     sample() {
         console.log('sample-start');
-        // promise内でthisのスコープが変わるため
-        let parent = this;
-        return new Promise(function (resolve, reject) {
-            parent.jenkins.info().then(function () {
+        return new Promise((resolve, reject) => {
+            this.jenkins.info().then(() => {
                 console.log('sample-end-resolve');
                 resolve();
-            }).catch(function () {
+            }).catch(() => {
                 console.log('sample-end-reject');
                 reject('error');
             });
