@@ -1,0 +1,3 @@
+machine:
+  timezone: Asia/Tokyo
+  node: v6.1.0
