@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "token=$MINIONS_TOKEN forever index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "$(npm bin)/mocha test/*"
   },
   "author": "mesh1neko",
   "license": "ISC",
@@ -17,6 +17,7 @@
     "jenkins": "^0.20.0"
   },
   "devDependencies": {
+    "chai": "^3.5.0",
     "eslint": "^3.14.0",
     "gulp": "^3.9.1",
     "gulp-eslint": "^3.0.1",
@@ -27,6 +28,8 @@
     "gulp-spawn-mocha": "^3.1.0",
     "istanbul": "^0.4.5",
     "mocha": "^3.2.0",
-    "nodemon": "^1.11.0"
+    "mocha-sinon": "^2.0.0",
+    "nodemon": "^1.11.0",
+    "sinon": "^2.1.0"
   }
 }
