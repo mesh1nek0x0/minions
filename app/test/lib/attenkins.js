@@ -21,34 +21,48 @@ const jenkins = require('jenkins')(
 
 
 describe('test - info test', function () {
-    let target = new Attenkins();
-    it('-- info success', function () {
-        let stub = sinon.stub(jenkins, 'info').returns(Promise.resolve());
-        target.setJenkins(jenkins);
+    let target;
+    let spy;
+    let stub;
 
-        let spy = sinon.spy(console, 'log');
+    before(function(done) {
+        target = new Attenkins();
+        done();
+    });
+
+    beforeEach(function(done) {
+        console.log('before');
+        spy = sinon.spy(console, 'log');
+        done();
+    });
+
+    afterEach(function (done) {
+        spy.restore();
+        stub.restore();
+        console.log('after');
+        done();
+    });
+
+
+    it('-- info success', function () {
+        stub = sinon.stub(jenkins, 'info').returns(Promise.resolve());
+        target.setJenkins(jenkins);
 
         return target.sample().then(function () {
             expect(spy.callCount).to.equal(2);
             expect(spy.args[1][0]).to.equal('sample-end-resolve');
-            stub.restore();
-            spy.restore();
         }).catch(function () {
         });
     });
 
     it('-- info failure', function () {
-        let stub = sinon.stub(jenkins, 'info').returns(Promise.reject());
+        stub = sinon.stub(jenkins, 'info').returns(Promise.reject());
         target.setJenkins(jenkins);
-
-        let spy = sinon.spy(console, 'log');
 
         return target.sample().then(function () {})
         .catch(function () {
             expect(spy.callCount).to.equal(2);
             expect(spy.args[1][0]).to.equal('sample-end-reject');
-            stub.restore();
-            spy.restore();
         });
     });
 });
