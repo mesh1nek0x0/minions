@@ -5,6 +5,7 @@ const Attenkins = require('../../lib/attenkins.js');
 const config = require('config');
 const util = require('util');
 const sinon = require('sinon');
+const moment = require('moment');
 const jenkins = require('jenkins')(
     {
         baseUrl: util.format(
@@ -110,48 +111,108 @@ describe('test - checkInOutOffice', function () {
     let target = new Attenkins();
     let stub;
     let spy;
+    let clock;
 
     beforeEach(function () {
         spy = sinon.spy(console, 'log');
     });
 
     afterEach(function () {
+        clock.restore();
         spy.restore();
         stub.restore();
     });
 
 
-    it('-- 出勤jobをkickできること', function () {
+    it('-- 15時までなら出勤jobをkickできること', function () {
+        clock = sinon.useFakeTimers(
+            // TODO: 直接format文字列からintegerにできるなら変更する
+            parseInt(moment(
+                moment().tz('Asia/Tokyo').format('YYYY-MM-DD 14:mm:ss')
+            ).format('x'))
+        );
         stub = sinon.stub(jenkins.job, 'build').returns(Promise.resolve());
 
         target.setJenkins(jenkins);
 
         return target.checkInOutOffice('dummy', 'hi').then(() => {
-            expect(spy.calledOnce);
-            expect(spy.args[0][0]).to.equal('hi job is kicked by dummy');
+            expect(spy.callCount).to.equal(2);
+            expect(spy.args[0][0]).to.equal('now:14 o\'clock');
+            expect(spy.args[1][0]).to.equal('hi job is kicked by dummy');
         });
     });
 
-    it('-- 退勤jobをkickできること', function () {
+    it('-- 15時以降だと出勤jobをkickできないこと', function () {
+        clock = sinon.useFakeTimers(
+            // TODO: 直接format文字列からintegerにできるなら変更する
+            parseInt(moment(
+                moment().tz('Asia/Tokyo').format('YYYY-MM-DD 15:mm:ss')
+            ).format('x'))
+        );
+
+        // 変更になった場合に備えてstubしておく
+        stub = sinon.stub(jenkins.job, 'build').returns(Promise.resolve());
+        target.setJenkins(jenkins);
+
+        return target.checkInOutOffice('dummy', 'hi').then(() => {
+        }).catch(function () {
+            expect(spy.callCount).to.equal(1);
+            expect(spy.args[0][0]).to.equal('now:15 o\'clock');
+        });
+    });
+
+    it('-- 12時以降に退勤jobをkickできること', function () {
+        clock = sinon.useFakeTimers(
+            // TODO: 直接format文字列からintegerにできるなら変更する
+            parseInt(moment(
+                moment().tz('Asia/Tokyo').format('YYYY-MM-DD 13:mm:ss')
+            ).format('x'))
+        );
         stub = sinon.stub(jenkins.job, 'build').returns(Promise.resolve());
 
         target.setJenkins(jenkins);
 
         return target.checkInOutOffice('dummy', 'bye').then(() => {
-            expect(spy.calledOnce);
-            expect(spy.args[0][0]).to.equal('bye job is kicked by dummy');
+            expect(spy.callCount).to.equal(2);
+            expect(spy.args[0][0]).to.equal('now:13 o\'clock');
+            expect(spy.args[1][0]).to.equal('bye job is kicked by dummy');
         });
     });
 
-    it('-- jobのkickにした場合、rejectでログを出せること', function () {
+    it('-- 13時前だと退勤jobをkickできないこと', function () {
+        clock = sinon.useFakeTimers(
+            // TODO: 直接format文字列からintegerにできるなら変更する
+            parseInt(moment(
+                moment().tz('Asia/Tokyo').format('YYYY-MM-DD 12:mm:ss')
+            ).format('x'))
+        );
+        stub = sinon.stub(jenkins.job, 'build').returns(Promise.resolve());
+
+        target.setJenkins(jenkins);
+
+        return target.checkInOutOffice('dummy', 'bye').then(() => {
+        }).catch(function () {
+            expect(spy.callCount).to.equal(1);
+            expect(spy.args[0][0]).to.equal('now:12 o\'clock');
+        });
+    });
+
+    it('-- jobのkickに失敗した場合、rejectでログを出せること', function () {
+        // 打刻のタイミングに問題がないこと
+        clock = sinon.useFakeTimers(
+            // TODO: 直接format文字列からintegerにできるなら変更する
+            parseInt(moment(
+                moment().tz('Asia/Tokyo').format('YYYY-MM-DD 14:mm:ss')
+            ).format('x'))
+        );
         stub = sinon.stub(jenkins.job, 'build').returns(Promise.reject());
 
         target.setJenkins(jenkins);
 
         return target.checkInOutOffice('dummy', 'hi').then(() => {
         }).catch(() => {
-            expect(spy.calledOnce);
-            expect(spy.args[0][0]).to.equal('hi job couldn\'t kicked');
+            expect(spy.callCount).to.equal(2);
+            expect(spy.args[1][0]).to.equal('hi job couldn\'t kicked');
         });
     });
 });
