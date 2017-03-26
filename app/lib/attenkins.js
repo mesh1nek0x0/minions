@@ -40,7 +40,7 @@ module.exports = class Attenkins{
     }
 
     checkInOutOffice(user, greeting) {
-        return new Promise(function (resolve, reject) {
+        return new Promise((resolve, reject) => {
             this.jenkins.job.build({
                 name: util.format(
                     '%s-%s',
@@ -51,10 +51,10 @@ module.exports = class Attenkins{
                     user: user,
                     group: greeting
                 }
-            }).then(function () {
+            }).then(() => {
                 console.log(greeting + ' job is kicked by ' + user);
                 resolve();
-            }).catch(function () {
+            }).catch(() => {
                 console.log(greeting + ' job couldn\'t kicked');
                 reject();
             });

@@ -105,3 +105,53 @@ describe('test - getServerInfo', function () {
         });
     });
 });
+
+describe('test - checkInOutOffice', function () {
+    let target = new Attenkins();
+    let stub;
+    let spy;
+
+    beforeEach(function () {
+        spy = sinon.spy(console, 'log');
+    });
+
+    afterEach(function () {
+        spy.restore();
+        stub.restore();
+    });
+
+
+    it('-- 出勤jobをkickできること', function () {
+        stub = sinon.stub(jenkins.job, 'build').returns(Promise.resolve());
+
+        target.setJenkins(jenkins);
+
+        return target.checkInOutOffice('dummy', 'hi').then(() => {
+            expect(spy.calledOnce);
+            expect(spy.args[0][0]).to.equal('hi job is kicked by dummy');
+        });
+    });
+
+    it('-- 退勤jobをkickできること', function () {
+        stub = sinon.stub(jenkins.job, 'build').returns(Promise.resolve());
+
+        target.setJenkins(jenkins);
+
+        return target.checkInOutOffice('dummy', 'bye').then(() => {
+            expect(spy.calledOnce);
+            expect(spy.args[0][0]).to.equal('bye job is kicked by dummy');
+        });
+    });
+
+    it('-- jobのkickにした場合、rejectでログを出せること', function () {
+        stub = sinon.stub(jenkins.job, 'build').returns(Promise.reject());
+
+        target.setJenkins(jenkins);
+
+        return target.checkInOutOffice('dummy', 'hi').then(() => {
+        }).catch(() => {
+            expect(spy.calledOnce);
+            expect(spy.args[0][0]).to.equal('hi job couldn\'t kicked');
+        });
+    });
+});
