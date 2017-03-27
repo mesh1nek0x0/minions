@@ -1,5 +1,5 @@
 const Botkit = require('botkit');
-const attenkins = require('./attenkins.js');
+const Attenkins = require('./lib/attenkins.js');
 const config = require('config');
 const util = require('util');
 
@@ -23,6 +23,7 @@ controller.spawn({
 
 controller.hears(['hi', 'bye'], ['direct_message', 'direct_mention', 'mention'], function(bot, message) {
     bot.api.users.info({user: message.user}, (error, response) => {
+        let attenkins = new Attenkins();
         attenkins.checkInOutOffice(response.user.name, message.text)
         .then(function () {
             bot.reply(
