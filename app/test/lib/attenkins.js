@@ -5,7 +5,7 @@ const Attenkins = require('../../lib/attenkins.js');
 const config = require('config');
 const util = require('util');
 const sinon = require('sinon');
-const moment = require('moment');
+const moment = require('moment-timezone');
 const jenkins = require('jenkins')(
     {
         baseUrl: util.format(
