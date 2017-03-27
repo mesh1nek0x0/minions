@@ -44,11 +44,11 @@ module.exports = class Attenkins{
         console.log('now:' + moment().format('HH') + ' o\'clock');
         return new Promise((resolve, reject) => {
             // 15時以降にhiするのは勘違いの可能性大
-            if (moment().format('HH') >= 15 && greeting == 'hi') {
+            if (moment().format('HH') >= config.attenkins.timeLimits.checkIn && greeting == 'hi') {
                 return reject('fail-safe');
             }
             // 13時前にbyeするのは勘違いの可能性大
-            if (moment().format('HH') < 13 && greeting == 'bye') {
+            if (moment().format('HH') < config.attenkins.timeLimits.checkOut && greeting == 'bye') {
                 return reject('fail-safe');
             }
 

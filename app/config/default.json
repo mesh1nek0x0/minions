@@ -12,5 +12,11 @@
   },
   "botkit" : {
     "retryMax" : 3
+  },
+  "attenkins" : {
+    "timeLimits" : {
+      "checkIn" : 15,
+      "checkOut" : 13
+    }
   }
 }
