@@ -61,3 +61,18 @@ controller.hears('forever', ['direct_message', 'direct_mention', 'mention'], fun
         }
     );
 });
+
+controller.hears('log', ['direct_message', 'direct_mention', 'mention'], function(bot, message) {
+    bot.api.users.info({user: message.user}, (error, response) => {
+        let attenkins = new Attenkins();
+        attenkins.loggingWorkLog(response.user.name, message.text)
+        .then(function () {
+            bot.reply(
+                message,
+                'hi! I\'m minions! I try to log Yesterday Working-Log!\n'
+            );
+        }).catch(function () {
+            bot.reply(message, 'hi! I\'m minions! sorry I failed mission\n');
+        });
+    });
+});
