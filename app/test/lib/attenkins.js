@@ -216,3 +216,42 @@ describe('test - checkInOutOffice', function () {
         });
     });
 });
+
+describe('test - loggingWorkLog', function () {
+    let target = new Attenkins();
+    let stub;
+    let spy;
+
+    beforeEach(function () {
+        spy = sinon.spy(console, 'log');
+    });
+
+    afterEach(function () {
+        spy.restore();
+        stub.restore();
+    });
+
+
+    it('-- 日時提出jobをkickできること', function () {
+        stub = sinon.stub(jenkins.job, 'build').returns(Promise.resolve());
+
+        target.setJenkins(jenkins);
+
+        return target.loggingWorkLog('dummy').then(() => {
+            expect(spy.callCount).to.equal(1);
+            expect(spy.args[0][0]).to.equal('logging work log job is kicked by dummy');
+        });
+    });
+
+    it('-- 日時提出jobのkickに失敗した場合、rejectでログを出せること', function () {
+        stub = sinon.stub(jenkins.job, 'build').returns(Promise.reject());
+
+        target.setJenkins(jenkins);
+
+        return target.loggingWorkLog('dummy').then(() => {
+        }).catch(() => {
+            expect(spy.callCount).to.equal(1);
+            expect(spy.args[0][0]).to.equal('logging work log job couldn\'t kicked');
+        });
+    });
+});
