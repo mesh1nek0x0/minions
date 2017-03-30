@@ -55,7 +55,7 @@ module.exports = class Attenkins{
             this.jenkins.job.build({
                 name: util.format(
                     '%s-%s',
-                    config.jenkins.job.attenkins.prefix,
+                    config.jenkins.job.checkInOut.prefix,
                     user
                 ),
                 parameters: {
@@ -81,6 +81,27 @@ module.exports = class Attenkins{
             }).catch(() => {
                 console.log('sample-end-reject');
                 reject('error');
+            });
+        });
+    }
+
+    loggingWorkLog(user) {
+        return new Promise((resolve, reject) => {
+            this.jenkins.job.build({
+                name: util.format(
+                    '%s-%s',
+                    config.jenkins.job.loggingWorkLog.prefix,
+                    user
+                ),
+                parameters: {
+                    user: user,
+                }
+            }).then(() => {
+                console.log('logging work log job is kicked by ' + user);
+                resolve();
+            }).catch(() => {
+                console.log('logging work log job couldn\'t kicked');
+                reject();
             });
         });
     }

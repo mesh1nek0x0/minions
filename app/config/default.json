@@ -5,8 +5,11 @@
     "host" : "jenkins-php",
     "port" : "8080",
     "job" : {
-      "attenkins" : {
+      "checkInOut" : {
         "prefix" : "checkInOut"
+      },
+      "loggingWorkLog" : {
+        "prefix" : "loggingWorkLog"
       }
     }
   },
