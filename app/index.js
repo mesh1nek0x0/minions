@@ -10,6 +10,7 @@ if (!process.env.token) {
 
 const controller = Botkit.slackbot({
     retry: config.botkit.retryMax,
+    json_file_store: 'minions_simple_db',
     debug: false
 });
 
@@ -62,7 +63,7 @@ controller.hears('forever', ['direct_message', 'direct_mention', 'mention'], fun
     );
 });
 
-controller.hears('log', ['direct_message', 'direct_mention', 'mention'], function(bot, message) {
+controller.hears('^log$', ['direct_message', 'direct_mention', 'mention'], function(bot, message) {
     bot.api.users.info({user: message.user}, (error, response) => {
         let attenkins = new Attenkins();
         attenkins.loggingWorkLog(response.user.name, message.text)
@@ -73,6 +74,26 @@ controller.hears('log', ['direct_message', 'direct_mention', 'mention'], functio
             );
         }).catch(function () {
             bot.reply(message, 'hi! I\'m minions! sorry I failed mission\n');
+        });
+    });
+});
+
+controller.hears('toggle-logging', ['direct_message', 'direct_mention', 'mention'], function(bot, message) {
+    bot.api.users.info({user: message.user}, (error, response) => {
+        controller.storage.users.get(response.user.name, (err, userSetting) => {
+            if (!userSetting) {
+                userSetting = {
+                    'id': response.user.name,
+                    'logging': false
+                };
+            }
+
+            controller.storage.users.save({'id': response.user.name, 'logging':!userSetting.logging}, () => {
+                bot.reply(
+                    message,
+                    util.format('hi! I\'m minions! I toggle logging setting to %s!\n', userSetting.logging)
+                );
+            });
         });
     });
 });

@@ -9,3 +9,4 @@ node_modules/
 *.log
 output/*
 .env.minions
+app/minions_simple_db/*
