@@ -59,14 +59,27 @@ controller.hears(['hi', 'bye'], ['direct_message', 'direct_mention', 'mention'],
 
 controller.hears('info', ['direct_message', 'direct_mention', 'mention'], function(bot, message) {
     bot.api.users.info({user: message.user}, (error, response) => {
-        bot.reply(
-            message,
-            util.format(
-                'hi %s ! I\'m minions! I\'m still alive now!\n retryMax is %d',
-                response.user.name,
-                config.botkit.retryMax
-            )
-        );
+        controller.storage.users.get(response.user.name, (err, setting) => {
+            if (!setting) {
+                bot.reply(
+                    message,
+                    util.format(
+                        'hi %s ! I\'m minions! I\'m still alive now!',
+                        response.user.name
+                    )
+                );
+                return;
+            }
+            bot.reply(
+                message,
+                util.format(
+                    'hi %s ! I\'m still alive now!\n counter is %d & logging is %s',
+                    response.user.name,
+                    setting.counter,
+                    setting.logging
+                )
+            );
+        });
     });
 });
 
