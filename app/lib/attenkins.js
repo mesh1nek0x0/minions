@@ -4,6 +4,7 @@ const config = require('config');
 const util = require('util');
 const jenkins = require('jenkins');
 const moment = require('moment-timezone');
+const Promise = require('bluebird');
 
 module.exports = class Attenkins{
 

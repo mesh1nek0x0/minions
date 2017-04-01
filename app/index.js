@@ -2,6 +2,7 @@ const Botkit = require('botkit');
 const Attenkins = require('./lib/attenkins.js');
 const config = require('config');
 const util = require('util');
+const CronJob = require('cron').CronJob;
 
 if (!process.env.token) {
     console.log('Error: Specify token in enviroment');
