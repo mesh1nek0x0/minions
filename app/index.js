@@ -17,7 +17,50 @@ const controller = Botkit.slackbot({
 
 controller.spawn({
     token: process.env.token
-}).startRTM(function(err){
+}).startRTM(function(err, bot){
+    new CronJob({
+        cronTime: '30 */2 * * 1-5',
+        onTick: () => {
+            console.log('cron job started');
+            controller.storage.users.all((err, logCounters) => {
+                if (!logCounters) {
+                    return;
+                }
+                Object.keys(logCounters).forEach((key) => {
+                    if (logCounters[key].logging == false) {
+                        return;
+                    }
+                    if (logCounters[key].counter >= 5) {
+                        let attenkins = new Attenkins();
+                        attenkins.loggingWorkLog(logCounters[key].id).then(() => {
+                            console.log('connect succeeded...');
+                        }).catch(() => {
+                            console.log('connect faled...');
+                        }).finally(() => {
+                            bot.say({
+                                channel: config.botkit.channel,
+                                text: util.format('@%s I tried to log your Working-Log', logCounters[key].id),
+                                link_names: 1,
+                            });
+                            logCounters[key].counter = 0;
+                            controller.storage.users.save(logCounters[key]);
+                            return;
+                        });
+                    }
+
+                    if (logCounters[key].counter >= 2) {
+                        console.log('id:' + logCounters[key].id);
+                        console.log('counter is up++');
+                        logCounters[key].counter++;
+                        controller.storage.users.save(logCounters[key]);
+                    }
+
+                });
+            });
+        },
+        start: true
+
+    });
     if (err) {
         throw new Error(err);
     }

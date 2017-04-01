@@ -14,7 +14,8 @@
     }
   },
   "botkit" : {
-    "retryMax" : 3
+    "retryMax" : 3,
+    "channel" : "attenkins-test"
   },
   "attenkins" : {
     "timeLimits" : {
