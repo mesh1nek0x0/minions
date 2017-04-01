@@ -35,6 +35,22 @@ controller.hears(['hi', 'bye'], ['direct_message', 'direct_mention', 'mention'],
                     (message.text == 'hi') ? 'in' : 'out'
                 )
             );
+            controller.storage.users.get(response.user.name, (err, setting) => {
+                if (!setting || !setting.logging) {
+                    return;
+                }
+                switch (message.text) {
+                    case 'hi':
+                        setting.counter = 1;
+                        break;
+                    case 'bye':
+                        setting.counter = (setting.counter == 1) ? 2 : 0;
+                        break;
+                    default:
+                        setting.counter = 0;
+                }
+                controller.storage.users.save(setting);
+            });
         }).catch(function () {
             bot.reply(message, 'hi! I\'m minions! sorry I failed mission\n');
         });
