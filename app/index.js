@@ -85,11 +85,15 @@ controller.hears('toggle-logging', ['direct_message', 'direct_mention', 'mention
             if (!userSetting) {
                 userSetting = {
                     'id': response.user.name,
-                    'logging': false
+                    'logging': false,
+                    'counter': 0
                 };
             }
 
-            controller.storage.users.save({'id': response.user.name, 'logging':!userSetting.logging}, () => {
+            userSetting.logging = !userSetting.logging;
+            userSetting.counter = 0;
+
+            controller.storage.users.save(userSetting, () => {
                 bot.reply(
                     message,
                     util.format('hi! I\'m minions! I toggle logging setting to %s!\n', userSetting.logging)
