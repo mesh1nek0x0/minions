@@ -21,23 +21,23 @@ const jenkins = require('jenkins')(
 );
 
 
-describe('test - info', function () {
+describe('test - info', () => {
     let target;
     let spy;
     let stub;
 
-    before(function(done) {
+    before((done) => {
         target = new Attenkins();
         done();
     });
 
-    beforeEach(function(done) {
+    beforeEach((done) => {
         console.log('before');
         spy = sinon.spy(console, 'log');
         done();
     });
 
-    afterEach(function (done) {
+    afterEach((done) => {
         spy.restore();
         stub.restore();
         console.log('after');
@@ -45,86 +45,84 @@ describe('test - info', function () {
     });
 
 
-    it('-- info success', function () {
+    it('-- info success', () => {
         stub = sinon.stub(jenkins, 'info').returns(Promise.resolve());
         target.setJenkins(jenkins);
 
-        return target.sample().then(function () {
+        return target.sample().then(() => {
             expect(spy.callCount).to.equal(2);
             expect(spy.args[1][0]).to.equal('sample-end-resolve');
-        }).catch(function () {
+        }).catch(() => {
         });
     });
 
-    it('-- info failure', function () {
+    it('-- info failure', () => {
         stub = sinon.stub(jenkins, 'info').returns(Promise.reject());
         target.setJenkins(jenkins);
 
-        return target.sample().then(function () {})
-        .catch(function () {
+        return target.sample().then(() => {})
+        .catch(() => {
             expect(spy.callCount).to.equal(2);
             expect(spy.args[1][0]).to.equal('sample-end-reject');
         });
     });
 });
 
-describe('test - getServerInfo', function () {
+describe('test - getServerInfo', () => {
     let target = new Attenkins();
     let stub;
     let spy;
 
-    beforeEach(function () {
+    beforeEach(() => {
         spy = sinon.spy(console, 'log');
     });
 
-    afterEach(function () {
+    afterEach(() => {
         spy.restore();
         stub.restore();
     });
 
-    it('-- getServerinfo success', function () {
+    it('-- getServerinfo success', () => {
         stub = sinon.stub(jenkins, 'info').returns(Promise.resolve('hoge'));
 
         target.setJenkins(jenkins);
 
-        return target.getServerInfo().then(function () {
+        return target.getServerInfo().then(() => {
             expect(spy.calledOnce);
             expect(spy.args[0][0]).to.equal('hoge');
         });
     });
 
-    it('-- getServerInfo failure', function () {
+    it('-- getServerInfo failure', () => {
         stub = sinon.stub(jenkins, 'info').returns(Promise.reject('error'));
 
         target.setJenkins(jenkins);
 
-        return target.getServerInfo().then(
-            function () {}
-        ).catch(function () {
+        return target.getServerInfo().then(() => {}).catch(() => {
             expect(spy.calledOnce);
             expect(spy.args[0][0]).to.equal('error');
         });
     });
 });
 
-describe('test - checkInOutOffice', function () {
+describe('test - checkInOutOffice', () => {
     let target = new Attenkins();
     let stub;
     let spy;
     let clock;
 
-    beforeEach(function () {
+    beforeEach(() => {
         spy = sinon.spy(console, 'log');
     });
 
-    afterEach(function () {
+    afterEach(() => {
         clock.restore();
         spy.restore();
         stub.restore();
     });
 
 
-    it('-- 15時までなら出勤jobをkickできること', function () {
+    it('-- 15時までなら出勤jobをkickできること', () => {
         clock = sinon.useFakeTimers(
             // TODO: 直接format文字列からintegerにできるなら変更する
             parseInt(moment(
@@ -142,7 +140,7 @@ describe('test - checkInOutOffice', function () {
         });
     });
 
-    it('-- 15時以降だと出勤jobをkickできないこと', function () {
+    it('-- 15時以降だと出勤jobをkickできないこと', () => {
         clock = sinon.useFakeTimers(
             // TODO: 直接format文字列からintegerにできるなら変更する
             parseInt(moment(
@@ -155,13 +153,13 @@ describe('test - checkInOutOffice', function () {
         target.setJenkins(jenkins);
 
         return target.checkInOutOffice('dummy', 'hi').then(() => {
-        }).catch(function () {
+        }).catch(() => {
             expect(spy.callCount).to.equal(1);
             expect(spy.args[0][0]).to.equal('now:15 o\'clock');
         });
     });
 
-    it('-- 12時以降に退勤jobをkickできること', function () {
+    it('-- 12時以降に退勤jobをkickできること', () => {
         clock = sinon.useFakeTimers(
             // TODO: 直接format文字列からintegerにできるなら変更する
             parseInt(moment(
@@ -179,7 +177,7 @@ describe('test - checkInOutOffice', function () {
         });
     });
 
-    it('-- 13時前だと退勤jobをkickできないこと', function () {
+    it('-- 13時前だと退勤jobをkickできないこと', () => {
         clock = sinon.useFakeTimers(
             // TODO: 直接format文字列からintegerにできるなら変更する
             parseInt(moment(
@@ -191,13 +189,13 @@ describe('test - checkInOutOffice', function () {
         target.setJenkins(jenkins);
 
         return target.checkInOutOffice('dummy', 'bye').then(() => {
-        }).catch(function () {
+        }).catch(() => {
             expect(spy.callCount).to.equal(1);
             expect(spy.args[0][0]).to.equal('now:12 o\'clock');
         });
     });
 
-    it('-- jobのkickに失敗した場合、rejectでログを出せること', function () {
+    it('-- jobのkickに失敗した場合、rejectでログを出せること', () => {
         // 打刻のタイミングに問題がないこと
         clock = sinon.useFakeTimers(
             // TODO: 直接format文字列からintegerにできるなら変更する
@@ -217,22 +215,22 @@ describe('test - checkInOutOffice', function () {
     });
 });
 
-describe('test - loggingWorkLog', function () {
+describe('test - loggingWorkLog', () => {
     let target = new Attenkins();
     let stub;
     let spy;
 
-    beforeEach(function () {
+    beforeEach(() => {
         spy = sinon.spy(console, 'log');
     });
 
-    afterEach(function () {
+    afterEach(() => {
         spy.restore();
         stub.restore();
     });
 
 
-    it('-- 日時提出jobをkickできること', function () {
+    it('-- 日時提出jobをkickできること', () => {
         stub = sinon.stub(jenkins.job, 'build').returns(Promise.resolve());
 
         target.setJenkins(jenkins);
@@ -243,7 +241,7 @@ describe('test - loggingWorkLog', function () {
         });
     });
 
-    it('-- 日時提出jobのkickに失敗した場合、rejectでログを出せること', function () {
+    it('-- 日時提出jobのkickに失敗した場合、rejectでログを出せること', () => {
         stub = sinon.stub(jenkins.job, 'build').returns(Promise.reject());
 
         target.setJenkins(jenkins);
