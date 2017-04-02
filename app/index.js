@@ -1,5 +1,6 @@
 const Botkit = require('botkit');
 const Attenkins = require('./lib/attenkins.js');
+const Monitor = require('./lib/monitor.js');
 const config = require('config');
 const util = require('util');
 const CronJob = require('cron').CronJob;
@@ -69,8 +70,8 @@ controller.spawn({
 controller.hears(['hi', 'bye'], ['direct_message', 'direct_mention', 'mention'], function(bot, message) {
     bot.api.users.info({user: message.user}, (error, response) => {
         let attenkins = new Attenkins();
-        attenkins.checkInOutOffice(response.user.name, message.text)
-        .then(function () {
+        attenkins.sample(response.user.name, message.text)
+        .then(() => {
             bot.reply(
                 message,
                 util.format(
@@ -78,22 +79,10 @@ controller.hears(['hi', 'bye'], ['direct_message', 'direct_mention', 'mention'],
                     (message.text == 'hi') ? 'in' : 'out'
                 )
             );
-            controller.storage.users.get(response.user.name, (err, setting) => {
-                if (!setting || !setting.logging) {
-                    return;
-                }
-                switch (message.text) {
-                    case 'hi':
-                        setting.counter = 1;
-                        break;
-                    case 'bye':
-                        setting.counter = (setting.counter == 1) ? 2 : 0;
-                        break;
-                    default:
-                        setting.counter = 0;
-                }
-                controller.storage.users.save(setting);
-            });
+        }).then(() => {
+            let monitor = new Monitor();
+            monitor.setRepositry(controller.storage.users);
+            monitor.log(response.user.name, message.text);
         }).catch(function () {
             bot.reply(message, 'hi! I\'m minions! sorry I failed mission\n');
         });
@@ -154,23 +143,14 @@ controller.hears('^log$', ['direct_message', 'direct_mention', 'mention'], funct
 controller.hears('toggle-logging', ['direct_message', 'direct_mention', 'mention'], function(bot, message) {
     bot.api.users.info({user: message.user}, (error, response) => {
         controller.storage.users.get(response.user.name, (err, userSetting) => {
-            if (!userSetting) {
-                userSetting = {
-                    'id': response.user.name,
-                    'logging': false,
-                    'counter': 0
-                };
-            }
-
-            userSetting.logging = !userSetting.logging;
-            userSetting.counter = 0;
-
-            controller.storage.users.save(userSetting, () => {
+            let monitor = new Monitor();
+            monitor.setRepositry(controller.storage.users);
+            monitor.toggleLogging(response.user.name).then((result) => {
                 bot.reply(
                     message,
-                    util.format('hi! I\'m minions! I toggle logging setting to %s!\n', userSetting.logging)
+                    util.format('hi! I\'m minions! I toggled logging setting to %s!\n', result)
                 );
-            });
+            }).catch(() => {});
         });
     });
 });

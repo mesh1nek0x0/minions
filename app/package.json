@@ -17,6 +17,7 @@
     "google-auth-library": "^0.10.0",
     "googleapis": "^16.1.0",
     "jenkins": "^0.20.0",
+    "jfs": "^0.2.6",
     "moment-timezone": "^0.5.11"
   },
   "devDependencies": {
