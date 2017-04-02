@@ -70,7 +70,7 @@ controller.spawn({
 controller.hears(['hi', 'bye'], ['direct_message', 'direct_mention', 'mention'], function(bot, message) {
     bot.api.users.info({user: message.user}, (error, response) => {
         let attenkins = new Attenkins();
-        attenkins.sample(response.user.name, message.text)
+        attenkins.checkInOutOffice(response.user.name, message.text)
         .then(() => {
             bot.reply(
                 message,
