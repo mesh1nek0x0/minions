@@ -52,7 +52,6 @@ describe('test - info', () => {
         return target.sample().then(() => {
             expect(spy.callCount).to.equal(2);
             expect(spy.args[1][0]).to.equal('sample-end-resolve');
-        }).catch(() => {
         });
     });
 
