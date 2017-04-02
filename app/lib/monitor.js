@@ -17,7 +17,6 @@ module.exports = class Monitor{
         return new Promise((resolve, reject) => {
             this.repository.get(userId, (err, setting) => {
                 if (!setting || !setting.logging) {
-                    console.log('hogggeee');
                     resolve('no setting');
                 }
 
@@ -32,12 +31,10 @@ module.exports = class Monitor{
                         setting.counter = 0;
                 }
                 this.repository.save(setting, () => {
-                    console.log('hogggeee');
                     return resolve(util.format('counter became to %d', setting.counter));
                 });
             });
         });
-        console.log('barr');
     }
 
     toggleLogging(userId){
