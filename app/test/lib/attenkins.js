@@ -6,6 +6,7 @@ const config = require('config');
 const util = require('util');
 const sinon = require('sinon');
 const moment = require('moment-timezone');
+const shouldRejected = require("promise-test-helper").shouldRejected;;
 const jenkins = require('jenkins')(
     {
         baseUrl: util.format(
@@ -59,8 +60,7 @@ describe('test - info', () => {
         stub = sinon.stub(jenkins, 'info').returns(Promise.reject());
         target.setJenkins(jenkins);
 
-        return target.sample().then(() => {})
-        .catch(() => {
+        return shouldRejected(target.sample()).catch(() => {
             expect(spy.callCount).to.equal(2);
             expect(spy.args[1][0]).to.equal('sample-end-reject');
         });
@@ -97,7 +97,7 @@ describe('test - getServerInfo', () => {
 
         target.setJenkins(jenkins);
 
-        return target.getServerInfo().then(() => {}).catch(() => {
+        return shouldRejected(target.getServerInfo()).catch(() => {
             expect(spy.calledOnce);
             expect(spy.args[0][0]).to.equal('error');
         });
@@ -119,7 +119,6 @@ describe('test - checkInOutOffice', () => {
         spy.restore();
         stub.restore();
     });
-
 
     it('-- 15時までなら出勤jobをkickできること', () => {
         clock = sinon.useFakeTimers(
@@ -151,8 +150,7 @@ describe('test - checkInOutOffice', () => {
         stub = sinon.stub(jenkins.job, 'build').returns(Promise.resolve());
         target.setJenkins(jenkins);
 
-        return target.checkInOutOffice('dummy', 'hi').then(() => {
-        }).catch(() => {
+        return shouldRejected(target.checkInOutOffice('dummy', 'hi')).catch(() => {
             expect(spy.callCount).to.equal(1);
             expect(spy.args[0][0]).to.equal('now:15 o\'clock');
         });
@@ -187,8 +185,7 @@ describe('test - checkInOutOffice', () => {
 
         target.setJenkins(jenkins);
 
-        return target.checkInOutOffice('dummy', 'bye').then(() => {
-        }).catch(() => {
+        return shouldRejected(target.checkInOutOffice('dummy', 'bye')).catch(() => {
             expect(spy.callCount).to.equal(1);
             expect(spy.args[0][0]).to.equal('now:12 o\'clock');
         });
@@ -206,8 +203,7 @@ describe('test - checkInOutOffice', () => {
 
         target.setJenkins(jenkins);
 
-        return target.checkInOutOffice('dummy', 'hi').then(() => {
-        }).catch(() => {
+        return shouldRejected(target.checkInOutOffice('dummy', 'hi')).catch(() => {
             expect(spy.callCount).to.equal(2);
             expect(spy.args[1][0]).to.equal('hi job couldn\'t kicked');
         });
@@ -228,7 +224,6 @@ describe('test - loggingWorkLog', () => {
         stub.restore();
     });
 
-
     it('-- 日時提出jobをkickできること', () => {
         stub = sinon.stub(jenkins.job, 'build').returns(Promise.resolve());
 
@@ -245,8 +240,7 @@ describe('test - loggingWorkLog', () => {
 
         target.setJenkins(jenkins);
 
-        return target.loggingWorkLog('dummy').then(() => {
-        }).catch(() => {
+        return shouldRejected(target.loggingWorkLog('dummy')).catch(() => {
             expect(spy.callCount).to.equal(1);
             expect(spy.args[0][0]).to.equal('logging work log job couldn\'t kicked');
         });
