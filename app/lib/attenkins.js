@@ -31,10 +31,10 @@ module.exports = class Attenkins{
     getServerInfo() {
         return new Promise((resolve, reject) => {
             this.jenkins.info().
-            then(function (data) {
+            then((data) => {
                 console.log(data);
                 resolve();
-            }).catch(function (error) {
+            }).catch((error) => {
                 console.log(error);
                 reject();
             });
