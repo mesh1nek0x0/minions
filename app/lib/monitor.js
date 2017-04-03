@@ -16,19 +16,23 @@ module.exports = class Monitor{
     log(userId, greeting) {
         return new Promise((resolve, reject) => {
             this.repository.get(userId, (err, setting) => {
+                if (err) {
+                    return resolve('error');
+                }
+
                 if (!setting || !setting.logging) {
-                    resolve('no setting');
+                    return resolve('no setting');
                 }
 
                 switch (greeting) {
-                    case 'hi':
-                        setting.counter = 1;
-                        break;
-                    case 'bye':
-                        setting.counter = (setting.counter == 1) ? 2 : 0;
-                        break;
-                    default:
-                        setting.counter = 0;
+                case 'hi':
+                    setting.counter = 1;
+                    break;
+                case 'bye':
+                    setting.counter = (setting.counter == 1) ? 2 : 0;
+                    break;
+                default:
+                    setting.counter = 0;
                 }
                 this.repository.save(setting, () => {
                     return resolve(util.format('counter became to %d', setting.counter));
@@ -56,4 +60,4 @@ module.exports = class Monitor{
             });
         });
     }
-}
+};

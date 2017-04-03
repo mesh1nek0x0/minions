@@ -1,16 +1,13 @@
-'use strict'
+'use strict';
 
 const Monitor = require('../../lib/monitor.js');
-const util = require('util');
-const sinon = require('sinon');
 const expect = require('chai').expect;
 const Store = require('jfs');
 
 describe('monitor test - log' ,() => {
     let target;
-    let spy;
     // TODO: ゆくゆくちゃんとstubすること
-    let db = new Store("data",{type:'memory'});
+    let db = new Store('data',{type:'memory'});
 
     before(function() {
         target = new Monitor();
@@ -20,7 +17,7 @@ describe('monitor test - log' ,() => {
         target.setRepositry(db);
 
         return target.log('dummy', 'hi').then((result) => {
-            expect(result).to.equal('no setting');
+            expect(result).to.equal('error');
         });
     });
 
@@ -72,9 +69,8 @@ describe('monitor test - log' ,() => {
 
 describe('monitor test - toggleLogging', () => {
     let target;
-    let spy;
     // TODO: ゆくゆくちゃんとstubすること
-    let db = new Store("data",{type:'memory'});
+    let db = new Store('data',{type:'memory'});
 
     before(function() {
         target = new Monitor();

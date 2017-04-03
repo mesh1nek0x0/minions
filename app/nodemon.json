@@ -5,7 +5,7 @@
   ],
   "watch": [
     "index.js",
-    "attenkins.js",
+    "lib/",
     "config/"
   ]
 }
