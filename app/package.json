@@ -10,11 +10,14 @@
   "author": "mesh1neko",
   "license": "ISC",
   "dependencies": {
+    "bluebird": "^3.5.0",
     "botkit": "^0.5.1",
     "config": "^1.25.1",
+    "cron": "^1.2.1",
     "google-auth-library": "^0.10.0",
     "googleapis": "^16.1.0",
     "jenkins": "^0.20.0",
+    "jfs": "^0.2.6",
     "moment-timezone": "^0.5.11"
   },
   "devDependencies": {

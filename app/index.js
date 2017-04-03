@@ -1,7 +1,9 @@
 const Botkit = require('botkit');
 const Attenkins = require('./lib/attenkins.js');
+const Monitor = require('./lib/monitor.js');
 const config = require('config');
 const util = require('util');
+const CronJob = require('cron').CronJob;
 
 if (!process.env.token) {
     console.log('Error: Specify token in enviroment');
@@ -10,12 +12,56 @@ if (!process.env.token) {
 
 const controller = Botkit.slackbot({
     retry: config.botkit.retryMax,
+    json_file_store: 'minions_simple_db',
     debug: false
 });
 
 controller.spawn({
     token: process.env.token
-}).startRTM(function(err){
+}).startRTM(function(err, bot){
+    new CronJob({
+        cronTime: '30 */2 * * 1-5',
+        onTick: () => {
+            console.log('cron job started');
+            controller.storage.users.all((err, logCounters) => {
+                if (!logCounters) {
+                    return;
+                }
+                Object.keys(logCounters).forEach((key) => {
+                    if (logCounters[key].logging == false) {
+                        return;
+                    }
+                    if (logCounters[key].counter >= 5) {
+                        let attenkins = new Attenkins();
+                        attenkins.loggingWorkLog(logCounters[key].id).then(() => {
+                            console.log('connect succeeded...');
+                        }).catch(() => {
+                            console.log('connect faled...');
+                        }).finally(() => {
+                            bot.say({
+                                channel: config.botkit.channel,
+                                text: util.format('@%s I tried to log your Working-Log', logCounters[key].id),
+                                link_names: 1,
+                            });
+                            logCounters[key].counter = 0;
+                            controller.storage.users.save(logCounters[key]);
+                            return;
+                        });
+                    }
+
+                    if (logCounters[key].counter >= 2) {
+                        console.log('id:' + logCounters[key].id);
+                        console.log('counter is up++');
+                        logCounters[key].counter++;
+                        controller.storage.users.save(logCounters[key]);
+                    }
+
+                });
+            });
+        },
+        start: true
+
+    });
     if (err) {
         throw new Error(err);
     }
@@ -25,7 +71,7 @@ controller.hears(['hi', 'bye'], ['direct_message', 'direct_mention', 'mention'],
     bot.api.users.info({user: message.user}, (error, response) => {
         let attenkins = new Attenkins();
         attenkins.checkInOutOffice(response.user.name, message.text)
-        .then(function () {
+        .then(() => {
             bot.reply(
                 message,
                 util.format(
@@ -33,6 +79,10 @@ controller.hears(['hi', 'bye'], ['direct_message', 'direct_mention', 'mention'],
                     (message.text == 'hi') ? 'in' : 'out'
                 )
             );
+        }).then(() => {
+            let monitor = new Monitor();
+            monitor.setRepositry(controller.storage.users);
+            monitor.log(response.user.name, message.text);
         }).catch(function () {
             bot.reply(message, 'hi! I\'m minions! sorry I failed mission\n');
         });
@@ -41,14 +91,27 @@ controller.hears(['hi', 'bye'], ['direct_message', 'direct_mention', 'mention'],
 
 controller.hears('info', ['direct_message', 'direct_mention', 'mention'], function(bot, message) {
     bot.api.users.info({user: message.user}, (error, response) => {
-        bot.reply(
-            message,
-            util.format(
-                'hi %s ! I\'m minions! I\'m still alive now!\n retryMax is %d',
-                response.user.name,
-                config.botkit.retryMax
-            )
-        );
+        controller.storage.users.get(response.user.name, (err, setting) => {
+            if (!setting) {
+                bot.reply(
+                    message,
+                    util.format(
+                        'hi %s ! I\'m minions! I\'m still alive now!',
+                        response.user.name
+                    )
+                );
+                return;
+            }
+            bot.reply(
+                message,
+                util.format(
+                    'hi %s ! I\'m still alive now!\n counter is %d & logging is %s',
+                    response.user.name,
+                    setting.counter,
+                    setting.logging
+                )
+            );
+        });
     });
 });
 
@@ -62,10 +125,10 @@ controller.hears('forever', ['direct_message', 'direct_mention', 'mention'], fun
     );
 });
 
-controller.hears('log', ['direct_message', 'direct_mention', 'mention'], function(bot, message) {
+controller.hears('^log$', ['direct_message', 'direct_mention', 'mention'], function(bot, message) {
     bot.api.users.info({user: message.user}, (error, response) => {
         let attenkins = new Attenkins();
-        attenkins.loggingWorkLog(response.user.name, message.text)
+        attenkins.loggingWorkLog(response.user.name)
         .then(function () {
             bot.reply(
                 message,
@@ -73,6 +136,21 @@ controller.hears('log', ['direct_message', 'direct_mention', 'mention'], functio
             );
         }).catch(function () {
             bot.reply(message, 'hi! I\'m minions! sorry I failed mission\n');
+        });
+    });
+});
+
+controller.hears('toggle-logging', ['direct_message', 'direct_mention', 'mention'], function(bot, message) {
+    bot.api.users.info({user: message.user}, (error, response) => {
+        controller.storage.users.get(response.user.name, (err, userSetting) => {
+            let monitor = new Monitor();
+            monitor.setRepositry(controller.storage.users);
+            monitor.toggleLogging(response.user.name).then((result) => {
+                bot.reply(
+                    message,
+                    util.format('hi! I\'m minions! I toggled logging setting to %s!\n', result)
+                );
+            }).catch(() => {});
         });
     });
 });
