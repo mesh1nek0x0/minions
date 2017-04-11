@@ -20,7 +20,8 @@ controller.spawn({
     token: process.env.token
 }).startRTM(function(err, bot){
     new CronJob({
-        cronTime: '30 */2 * * 1-5',
+        // 昨日のものを提出するので土曜も含める
+        cronTime: '30 */2 * * 1-6',
         onTick: () => {
             console.log('cron job started');
             controller.storage.users.all((err, logCounters) => {
