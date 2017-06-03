@@ -106,4 +106,30 @@ module.exports = class Attenkins{
             });
         });
     }
+
+    invite6tree(user, invitationDate) {
+        return new Promise((resolve, reject) => {
+            if (config.attenkins.admittee6p.indexOf(user) == -1) {
+                console.log('You have not been approved to invite!');
+                return reject();
+            }
+            this.jenkins.job.build({
+                name: util.format(
+                    '%s-%s',
+                    config.jenkins.job.invite6tree.prefix,
+                    user
+                ),
+                parameters: {
+                    user: user,
+                    invitationDate: invitationDate
+                }
+            }).then(() => {
+                console.log('invite 6tree job is kicked by ' + user);
+                resolve();
+            }).catch(() => {
+                console.log('invite 6tree job couldn\'t kicked');
+                reject();
+            });
+        });
+    }
 };

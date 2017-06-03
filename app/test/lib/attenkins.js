@@ -246,3 +246,51 @@ describe('test - loggingWorkLog', () => {
         });
     });
 });
+
+describe('test - invite6tree', () => {
+    let target = new Attenkins();
+    let stub;
+    let spy;
+
+    beforeEach(() => {
+        spy = sinon.spy(console, 'log');
+    });
+
+    afterEach(() => {
+        spy.restore();
+        stub.restore();
+    });
+
+    it('-- 六本木入館申請のjobをkickできること', () => {
+        stub = sinon.stub(jenkins.job, 'build').returns(Promise.resolve());
+
+        target.setJenkins(jenkins);
+
+        return target.invite6tree('tester', 'hoge').then(() => {
+            expect(spy.callCount).to.equal(1);
+            expect(spy.args[0][0]).to.equal('invite 6tree job is kicked by tester');
+        });
+    });
+
+        it('-- 許可されていない人は六本木入館申請のjobをkickがキャンセルされること', () => {
+        stub = sinon.stub(jenkins.job, 'build').returns(Promise.resolve());
+
+        target.setJenkins(jenkins);
+
+        return shouldRejected(target.invite6tree('untester', 'hoge')).catch(() => {
+            expect(spy.callCount).to.equal(1);
+            expect(spy.args[0][0]).to.equal('You have not been approved to invite!');
+        });
+    });
+
+    it('-- 六本木入館申請のjobのkickに失敗した場合、rejectでログを出せること', () => {
+        stub = sinon.stub(jenkins.job, 'build').returns(Promise.reject());
+
+        target.setJenkins(jenkins);
+
+        return shouldRejected(target.invite6tree('tester', 'foo')).catch(() => {
+            expect(spy.callCount).to.equal(1);
+            expect(spy.args[0][0]).to.equal('invite 6tree job couldn\'t kicked');
+        });
+    });
+});
