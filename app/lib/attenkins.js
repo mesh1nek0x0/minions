@@ -113,6 +113,18 @@ module.exports = class Attenkins{
                 console.log('You have not been approved to invite!');
                 return reject();
             }
+
+            if (!invitationDate.match(/.*\/.*\/.*/)) {
+                console.log('date format is not Y/M/D!');
+                return reject();
+            }
+
+            // 入力補完はYYYY/MM/DDだがISOのフォーマットはYYYY-MM-DDのため
+            if (!moment(invitationDate.replace(/\//g, '-')).isValid()) {
+                console.log('date is not valid');
+                return reject();
+            }
+
             this.jenkins.job.build({
                 name: util.format(
                     '%s-%s',
@@ -124,7 +136,7 @@ module.exports = class Attenkins{
                     invitationDate: invitationDate
                 }
             }).then(() => {
-                console.log('invite 6tree job is kicked by ' + user);
+                console.log(invitationDate + ' invite 6tree job is kicked by ' + user);
                 resolve();
             }).catch(() => {
                 console.log('invite 6tree job couldn\'t kicked');
