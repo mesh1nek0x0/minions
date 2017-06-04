@@ -106,4 +106,42 @@ module.exports = class Attenkins{
             });
         });
     }
+
+    invite6tree(user, invitationDate) {
+        return new Promise((resolve, reject) => {
+            if (config.attenkins.admittee6p.indexOf(user) == -1) {
+                console.log('You have not been approved to invite!');
+                return reject();
+            }
+
+            if (!invitationDate.match(/.*\/.*\/.*/)) {
+                console.log('date format is not Y/M/D!');
+                return reject();
+            }
+
+            // 入力補完はYYYY/MM/DDだがISOのフォーマットはYYYY-MM-DDのため
+            if (!moment(invitationDate.replace(/\//g, '-')).isValid()) {
+                console.log('date is not valid');
+                return reject();
+            }
+
+            this.jenkins.job.build({
+                name: util.format(
+                    '%s-%s',
+                    config.jenkins.job.invite6tree.prefix,
+                    user
+                ),
+                parameters: {
+                    user: user,
+                    invitationDate: invitationDate
+                }
+            }).then(() => {
+                console.log(invitationDate + ' invite 6tree job is kicked by ' + user);
+                resolve();
+            }).catch(() => {
+                console.log('invite 6tree job couldn\'t kicked');
+                reject();
+            });
+        });
+    }
 };
