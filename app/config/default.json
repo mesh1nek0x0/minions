@@ -10,6 +10,9 @@
       },
       "loggingWorkLog" : {
         "prefix" : "loggingWorkLog"
+      },
+      "invite6tree" : {
+        "prefix" : "Invite6tree"
       }
     }
   },
@@ -21,6 +24,7 @@
     "timeLimits" : {
       "checkIn" : 15,
       "checkOut" : 13
-    }
+    },
+    "admittee6p" : ["iida-ryota", "tester"]
   }
 }

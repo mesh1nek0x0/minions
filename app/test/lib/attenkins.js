@@ -246,3 +246,75 @@ describe('test - loggingWorkLog', () => {
         });
     });
 });
+
+describe('test - invite6tree', () => {
+    let target = new Attenkins();
+    let stub;
+    let spy;
+    let today;
+
+    beforeEach(() => {
+        spy = sinon.spy(console, 'log');
+        today = moment().tz('Asia/Tokyo').format('YYYY/MM/DD');
+    });
+
+    afterEach(() => {
+        spy.restore();
+        stub.restore();
+    });
+
+    it('-- 六本木入館申請のjobをkickできること', () => {
+        stub = sinon.stub(jenkins.job, 'build').returns(Promise.resolve());
+
+        target.setJenkins(jenkins);
+
+        return target.invite6tree('tester', today).then(() => {
+            expect(spy.callCount).to.equal(1);
+            expect(spy.args[0][0]).to.equal(today + ' invite 6tree job is kicked by tester');
+        });
+    });
+
+    it('-- 許可されていない人は六本木入館申請のjobをkickがキャンセルされること', () => {
+        stub = sinon.stub(jenkins.job, 'build').returns(Promise.resolve());
+
+        target.setJenkins(jenkins);
+
+        return shouldRejected(target.invite6tree('untester', today)).catch(() => {
+            expect(spy.callCount).to.equal(1);
+            expect(spy.args[0][0]).to.equal('You have not been approved to invite!');
+        });
+    });
+
+    it('-- 日付フォーマットがY/M/Dでない場合、失敗すること', () => {
+        stub = sinon.stub(jenkins.job, 'build').returns(Promise.resolve());
+
+        target.setJenkins(jenkins);
+
+        return shouldRejected(target.invite6tree('tester', '20170605')).catch(() => {
+            expect(spy.callCount).to.equal(1);
+            expect(spy.args[0][0]).to.equal('date format is not Y/M/D!');
+        });
+    });
+
+    it('-- 日付フォーマットがY/M/Dだが、日時として不適切な場合、失敗すること', () => {
+        stub = sinon.stub(jenkins.job, 'build').returns(Promise.resolve());
+
+        target.setJenkins(jenkins);
+
+        return shouldRejected(target.invite6tree('tester', '2017/06/32')).catch(() => {
+            expect(spy.callCount).to.equal(1);
+            expect(spy.args[0][0]).to.equal('date is not valid');
+        });
+    });
+
+    it('-- 六本木入館申請のjobのkickに失敗した場合、rejectでログを出せること', () => {
+        stub = sinon.stub(jenkins.job, 'build').returns(Promise.reject());
+
+        target.setJenkins(jenkins);
+
+        return shouldRejected(target.invite6tree('tester', today)).catch(() => {
+            expect(spy.callCount).to.equal(1);
+            expect(spy.args[0][0]).to.equal('invite 6tree job couldn\'t kicked');
+        });
+    });
+});
