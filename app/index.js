@@ -4,6 +4,7 @@ const Monitor = require('./lib/monitor.js');
 const config = require('config');
 const util = require('util');
 const CronJob = require('cron').CronJob;
+const moment = require('moment-timezone');
 
 if (!process.env.token) {
     console.log('Error: Specify token in enviroment');
@@ -152,6 +153,28 @@ controller.hears('toggle-logging', ['direct_message', 'direct_mention', 'mention
                     util.format('hi! I\'m minions! I toggled logging setting to %s!\n', result)
                 );
             }).catch(() => {});
+        });
+    });
+});
+
+controller.hears(['invite', 'invite (.*)'], ['direct_message', 'direct_mention', 'mention'], function(bot, message) {
+    let matches = message.text.match(/invite (.*)$/i);
+    let date = moment().tz('Asia/Tokyo').format('YYYY/MM/DD');
+    // 日付の有効性チェックはlibに任せる
+    if (matches) {
+        date = matches[1];
+    }
+
+    bot.api.users.info({user: message.user}, (error, response) => {
+        let attenkins = new Attenkins();
+        attenkins.invite6tree(response.user.name, date)
+        .then(() => {
+            bot.reply(
+                message,
+                util.format('hi! I\'m minions! I invite you to 6p-tree at %s soon!\n', date)
+            );
+        }).catch(() => {
+            bot.reply(message, 'hi! I\'m minions! sorry I failed to invite you\n');
         });
     });
 });
